@@ -2,13 +2,21 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import Table from 'react-bootstrap/Table'
+import { Link } from 'react-router-dom'
+import { Avatar } from "@files-ui/react";
 
 function Profile() {
   const userDetails = useSelector(state => state.user.details)
   return (
     <>
       <h1 className='text-center'>Profile</h1>
+      <Link className='button' to='/update-profile'>Update Profile</Link>
+      <Avatar className='avatar2'
+        readOnly
+        src={userDetails.photoPath}
+        alt={userDetails.firstName}
 
+      />
       <Table striped bordered hover style={{ maxWidth: 500 }} className="mx-auto">
         <tbody>
           <tr>
@@ -25,7 +33,7 @@ function Profile() {
           </tr>
         </tbody>
       </Table>
-      
+
     </>
   )
 }

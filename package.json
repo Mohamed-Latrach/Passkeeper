@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@files-ui/react": "^1.2.4",
     "@reduxjs/toolkit": "^1.9.7",
     "axios": "^1.6.0",
     "bootstrap": "^5.3.2",

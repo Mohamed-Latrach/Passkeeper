@@ -4,14 +4,16 @@ import axios from "axios";
 import { alertError, alertSuccess, extractErrorMessage } from "../utilities/feedback";
 
 
-export const fetchItems = createAsyncThunk('items/fetchItems', async () => {
-  const res = await axios.get(`${import.meta.env.VITE_API_URL}/items`)
+export const fetchPasswords = createAsyncThunk('passwords/fetchPasswords', async () => {
+  const token = localStorage.getItem("token")
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/passwords`, {headers: {Authorization: token}})
   return res.data
 })
 
-export const fetchItemById = createAsyncThunk('items/fetchItemById', async (id, { rejectWithValue }) => {
+export const fetchPasswordById = createAsyncThunk('passwords/fetchPasswordById', async (id, { rejectWithValue }) => {
   try {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/items/${id}`)
+    const token = localStorage.getItem("token")
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/passwords/${id}`, {headers: {Authorization: token}})
     return res.data
   } catch (error) {
     const errorMessage = extractErrorMessage(error)
@@ -19,13 +21,13 @@ export const fetchItemById = createAsyncThunk('items/fetchItemById', async (id, 
   }
 })
 
-export const requestCreatingItem = createAsyncThunk(
-  'items/requestCreatingItem',
+export const requestCreatingPassword = createAsyncThunk(
+  'passwords/requestCreatingPassword',
   async ({ formData, navigate }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token")
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/items`,
+        `${import.meta.env.VITE_API_URL}/passwords`,
         formData,
         {
           headers: {
@@ -42,13 +44,13 @@ export const requestCreatingItem = createAsyncThunk(
     }
   })
 
-export const requestUpdatingItem = createAsyncThunk(
-  'items/requestUpdatingItem',
+export const requestUpdatingPassword = createAsyncThunk(
+  'passwords/requestUpdatingPassword',
   async ({ id, formData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token")
       const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/items/${id}`,
+        `${import.meta.env.VITE_API_URL}/passwords/${id}`,
         formData,
         {
           headers: {
@@ -64,13 +66,13 @@ export const requestUpdatingItem = createAsyncThunk(
     }
   })
 
-export const requestDeletingItem = createAsyncThunk(
-  'items/requestDeletingItem',
+export const requestDeletingPassword = createAsyncThunk(
+  'passwords/requestDeletingPassword',
   async ({ id, closeModal }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token")
       const res = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/items/${id}`,
+        `${import.meta.env.VITE_API_URL}/passwords/${id}`,
         {
           headers: {
             Authorization: token
@@ -85,8 +87,8 @@ export const requestDeletingItem = createAsyncThunk(
     }
   })
 
-export const userSlice = createSlice({
-  name: 'items',
+export const passwordsSlice = createSlice({
+  name: 'passwords',
   initialState: {
     list: [],
     isLoading: false,
@@ -96,74 +98,74 @@ export const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchItems.pending, (state) => {
+      .addCase(fetchPasswords.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(fetchItems.fulfilled, (state, action) => {
+      .addCase(fetchPasswords.fulfilled, (state, action) => {
         state.isLoading = false
         state.list = action.payload
       })
-      .addCase(fetchItems.rejected, (state, action) => {
+      .addCase(fetchPasswords.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.error.message
       })
 
-      .addCase(requestCreatingItem.pending, (state) => {
+      .addCase(requestCreatingPassword.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(requestCreatingItem.fulfilled, (state, action) => {
+      .addCase(requestCreatingPassword.fulfilled, (state, action) => {
         state.isLoading = false
-        state.list.push(action.payload.item)
+        state.list.push(action.payload.password)
         alertSuccess(action.payload.message)
       })
-      .addCase(requestCreatingItem.rejected, (state, action) => {
+      .addCase(requestCreatingPassword.rejected, (state, action) => {
         state.isLoading = false
         const errorMessage = action.payload
         alertError(errorMessage)
         state.error = errorMessage
       })
 
-      .addCase(fetchItemById.pending, (state) => {
+      .addCase(fetchPasswordById.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(fetchItemById.fulfilled, (state, action) => {
+      .addCase(fetchPasswordById.fulfilled, (state, action) => {
         state.isLoading = false
         state.selected = action.payload
       })
-      .addCase(fetchItemById.rejected, (state, action) => {
+      .addCase(fetchPasswordById.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.error.message
       })
 
-      .addCase(requestUpdatingItem.pending, (state) => {
+      .addCase(requestUpdatingPassword.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(requestUpdatingItem.fulfilled, (state, action) => {
+      .addCase(requestUpdatingPassword.fulfilled, (state, action) => {
         state.isLoading = false
-        state.list = state.list.map(element => element._id === action.payload.item._id ? action.payload.item : element)
+        state.list = state.list.map(element => element._id === action.payload.password._id ? action.payload.password : element)
         alertSuccess(action.payload.message)
       })
-      .addCase(requestUpdatingItem.rejected, (state, action) => {
+      .addCase(requestUpdatingPassword.rejected, (state, action) => {
         state.isLoading = false
         const errorMessage = action.payload
         alertError(errorMessage)
         state.error = errorMessage
       })
 
-      .addCase(requestDeletingItem.pending, (state) => {
+      .addCase(requestDeletingPassword.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(requestDeletingItem.fulfilled, (state, action) => {
+      .addCase(requestDeletingPassword.fulfilled, (state, action) => {
         state.isLoading = false
-        state.list = state.list.filter(element => element._id !== action.payload.item._id)
+        state.list = state.list.filter(element => element._id !== action.payload.password._id)
         alertSuccess(action.payload.message)
       })
-      .addCase(requestDeletingItem.rejected, (state, action) => {
+      .addCase(requestDeletingPassword.rejected, (state, action) => {
         state.isLoading = false
         const errorMessage = action.payload
         alertError(errorMessage)
@@ -173,4 +175,4 @@ export const userSlice = createSlice({
 })
 
 
-export default userSlice.reducer
+export default passwordsSlice.reducer

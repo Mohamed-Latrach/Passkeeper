@@ -1,15 +1,24 @@
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Alert from 'react-bootstrap/Alert';
 
-import ItemCard from '../components/ItemCard';
+import PasswordCard from '../components/PasswordCard';
+import { fetchItems } from '../store/itemsSlice';
+import Loader from '../components/Loader';
+import { fetchPasswords } from '../store/passwordsSlice';
 
 function Home() {
-  const { list, error, isLoading } = useSelector(state => state.items)
+  const { list, error, isLoading } = useSelector(state => state.passwords)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(fetchPasswords())
+  }, [])
 
   if (isLoading) {
-    return <h1>Loading...</h1>
+    return <Loader />
   }
 
   if (error) {
@@ -22,9 +31,9 @@ function Home() {
 
   return (
     <Row>
-      {list.map((item, i) => (
+      {list.map((password, i) => (
         <Col sm={6} md={4} lg={3} key={i} className='mb-4'>
-          <ItemCard item={item} />
+          <PasswordCard password={password} />
         </Col>
       ))}
     </Row>

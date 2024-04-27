@@ -28,6 +28,41 @@ export const requestRegister = createAsyncThunk(
   }
 )
 
+export const requestMe = createAsyncThunk('user/requestMe', async (token, { rejectWithValue }) => {
+  console.log({token});
+  try {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, { headers: { Authorization: token } })
+    return res.data
+  } catch (error) {
+    const errorMessage = extractErrorMessage(error)
+    console.log(errorMessage);
+    return rejectWithValue(errorMessage)
+  }
+})
+
+export const requestUpdatingProfile = createAsyncThunk(
+  'user/requestUpdatingProfile',
+  async ({ formData, navigate }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token")
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/auth/profile`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: token
+          }
+        }
+      )
+      navigate(`/profile`)
+      return res.data
+    } catch (error) {
+      const errorMessage = extractErrorMessage(error)
+      return rejectWithValue(errorMessage)
+    }
+  })
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
@@ -38,14 +73,8 @@ export const userSlice = createSlice({
     error: null
   },
   reducers: {
-    login: (state, action) => {
-      state.isAuthenticated = true
-      state.token = action.payload.token
-      state.details = action.payload.details
-    },
     logout: (state) => {
       localStorage.removeItem('token')
-      localStorage.removeItem('userDetails')
       state.isAuthenticated = false
       state.token = null
       state.details = null
@@ -58,6 +87,7 @@ export const userSlice = createSlice({
         state.error = null
       })
       .addCase(requestLogin.fulfilled, (state, action) => {
+        state.isLoading = false
         state.isAuthenticated = true
 
         const token = action.payload.token
@@ -67,7 +97,7 @@ export const userSlice = createSlice({
         state.details = userDetails
 
         localStorage.setItem('token', token)
-        localStorage.setItem('userDetails', JSON.stringify(userDetails))
+
         alertSuccess(action.payload.message)
       })
       .addCase(requestLogin.rejected, (state, action) => {
@@ -90,10 +120,44 @@ export const userSlice = createSlice({
         alertError(errorMessage)
         state.error = errorMessage
       })
+
+      .addCase(requestMe.pending, (state) => {
+        // you can put some logic here
+      })
+      .addCase(requestMe.fulfilled, (state, action) => {
+        state.isAuthenticated = true
+        state.token = localStorage.getItem('token')
+        state.details = action.payload
+      })
+      .addCase(requestMe.rejected, (state, action) => {
+        localStorage.removeItem('token')
+        
+        const errorMessage = action.payload
+        alertError(errorMessage)
+      })
+
+      .addCase(requestUpdatingProfile.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(requestUpdatingProfile.fulfilled, (state, action) => {
+
+        const userDetails = action.payload.user
+        state.details = userDetails
+
+        alertSuccess(action.payload.message)
+
+      })
+      .addCase(requestUpdatingProfile.rejected, (state, action) => {
+        state.isLoading = false
+        const errorMessage = action.payload
+        alertError(errorMessage)
+        state.error = errorMessage
+      })
   }
 })
 
 
-export const { login, logout } = userSlice.actions
+export const { logout } = userSlice.actions
 
 export default userSlice.reducer

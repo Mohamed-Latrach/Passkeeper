@@ -9,19 +9,12 @@ import Sidebar from '../components/Sidebar'
 function NeutralLayout() {
   const isAuthenticated = useSelector(state => state.user.isAuthenticated)
   return (
-    isAuthenticated
-      ? (<>
-            <Sidebar />
-            <Container className="my-5">
-              <Outlet />
-            </Container>
-         </>)
-      : (<>
-            <Navbar />
-            <Container className='my-5'>
-              <Outlet />
-            </Container>
-         </>)
+    <>
+      {isAuthenticated ? <Sidebar /> : <Navbar />}
+      <Container className="my-5">
+        <Outlet />
+      </Container>
+    </>
   )
 }
 

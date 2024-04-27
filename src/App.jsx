@@ -1,5 +1,5 @@
-import { useEffect } from "react"
-import { useDispatch } from "react-redux"
+import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import Home from "./pages/Home"
@@ -8,53 +8,59 @@ import Register from "./pages/Register"
 import CreateItem from "./pages/CreateItem"
 import Profile from "./pages/Profile"
 import NotFound from "./pages/NotFound"
-import ItemDetails from "./pages/ItemDetails"
-import UpdateItem from "./pages/UpdateItem"
+import PasswordDetails from "./pages/PasswordDetails"
+import UpdatePassword from "./pages/UpdatePassword"
 import OutsideLayout from "./layouts/OutsideLayout"
 import InsideLayout from "./layouts/InsideLayout"
 import NeutralLayout from "./layouts/NeutralLayout"
-import { fetchItems } from "./store/itemsSlice"
-import { login } from "./store/userSlice"
+import { requestMe } from "./store/userSlice"
+import Loader from "./components/Loader"
+import UpdateProfile from "./pages/UpdateProfile"
 
 
 function App() {
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch()
 
-  // Check if user alredy logged in
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const userDetails = localStorage.getItem('userDetails')
-    if (token && userDetails) {
-      dispatch(login({ token, details: JSON.parse(userDetails) }))
+    // Check if user alredy logged in
+    const checkUser = async () => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        await dispatch(requestMe(token))
+      }
+      setLoading(false)
     }
+    checkUser()
   }, [])
 
-  useEffect(() => {
-    dispatch(fetchItems())
-  }, [])
+  if (loading) return <Loader />
 
   return (
     <BrowserRouter>
-      <Routes>
+      <div className="app">
+        <Routes>
 
-        <Route element={<OutsideLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
+          <Route element={<OutsideLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
 
-        <Route element={<InsideLayout />}>
-          <Route path="/create-item" element={<CreateItem />} />
-          <Route path="/update-item/:id" element={<UpdateItem />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
+          <Route element={<InsideLayout />}>
+            <Route path="/create-item" element={<CreateItem />} />
+            <Route path="/update-password/:id" element={<UpdatePassword />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/update-profile" element={<UpdateProfile />} />
+            <Route path="/" element={<Home />} />
+          </Route>
 
-        <Route element={<NeutralLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/items/:id" element={<ItemDetails />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
+          <Route element={<NeutralLayout />}>
+            <Route path="/passwords/:id" element={<PasswordDetails />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
 
-      </Routes>
+        </Routes>
+      </div>
     </BrowserRouter>
   )
 }

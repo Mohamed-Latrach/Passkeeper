@@ -3,9 +3,9 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { useDispatch } from "react-redux";
 
-import { requestDeletingItem } from "../store/itemsSlice";
+import { requestDeletingPassword } from "../store/passwordsSlice";
 
-function DeleteItemModal({ item }) {
+function DeletePasswordModal({ password }) {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -21,12 +21,12 @@ function DeleteItemModal({ item }) {
         <Modal.Header closeButton>
           <Modal.Title>Delete</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure that you want to delete the item <span className="fw-bold"> {item.title} </span>?</Modal.Body>
+        <Modal.Body>Are you sure that you want to delete the password of <span className="fw-bold"> {password.website} ({password.username}) </span>?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={() => dispatch(requestDeletingItem({ id: item._id, closeModal: handleClose }))}>
+          <Button variant="primary" onClick={() => dispatch(requestDeletingPassword({ id: password._id, closeModal: handleClose }))}>
             Delete
           </Button>
         </Modal.Footer>
@@ -35,4 +35,4 @@ function DeleteItemModal({ item }) {
   );
 }
 
-export default DeleteItemModal
+export default DeletePasswordModal

@@ -6,43 +6,43 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Spinner from 'react-bootstrap/Spinner';
 
-import { requestCreatingItem } from "../store/itemsSlice";
+import { requestCreatingPassword } from "../store/passwordsSlice";
 
 
 function CreateItem() {
-  const { isLoading } = useSelector(state => state.items)
+  const { isLoading } = useSelector(state => state.passwords)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [price, setPrice] = useState("")
+  const [website, setWebsite] = useState("")
+  const [username, setUsername] = useState("")
+  const [value, setValue] = useState("")
   const [file, setFile] = useState(null)
 
   async function handleSubmit(e) {
     e.preventDefault()
     const formData = new FormData()
-    formData.append("title", title)
-    formData.append("description", description)
-    formData.append("price", Number(price))
+    formData.append("website", website)
+    formData.append("username", username)
+    formData.append("value", value)
     formData.append("photo", file)
-    dispatch(requestCreatingItem({formData, navigate}))
+    dispatch(requestCreatingPassword({formData, navigate}))
   }
 
   return (
     <Container className="mt-3">
-      <h1>Create New Item</h1>
+      <h1>Create New Password</h1>
 
       <Form onSubmit={handleSubmit}>
 
         <Form.Group className="mb-3">
-          <Form.Label>Title</Form.Label>
-          <Form.Control name="title" value={title} onChange={e => setTitle(e.target.value)} />
+          <Form.Label>Website</Form.Label>
+          <Form.Control name="website" value={website} onChange={e => setWebsite(e.target.value)} />
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Description</Form.Label>
-          <Form.Control as="textarea" rows={3} name="description" value={description} onChange={e => setDescription(e.target.value)} />
+          <Form.Label>Username</Form.Label>
+          <Form.Control name="username" value={username} onChange={e => setUsername(e.target.value)} />
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -51,8 +51,8 @@ function CreateItem() {
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Price</Form.Label>
-          <Form.Control name="price" type="number" value={price} onChange={e => setPrice(e.target.value)} />
+          <Form.Label>Value</Form.Label>
+          <Form.Control name="value" value={value} onChange={e => setValue(e.target.value)} />
         </Form.Group>
 
         <Button type="submit" className="mx-auto d-block w-100" disabled={isLoading}>
